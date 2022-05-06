@@ -38,7 +38,7 @@ public class PlayerBehaviour : MonoBehaviour
     }
     IEnumerator Transition(float acceleration)
     {
-        rigidbody.angularVelocity = Vector3.zero;
+        //rigidbody.angularVelocity = Vector3.zero;
         for (; (acceleration < 0 && pace > 0) || (acceleration > 0 && pace < maxPace); pace += Time.deltaTime * acceleration)   //do the pace transition to maxPace when accelerating or to 0 when decelerating
         {
             //set the animation blend according to pace ratio. 0: idle, 1: running at full speed
@@ -72,8 +72,10 @@ public class PlayerBehaviour : MonoBehaviour
     {
         if (gameObject.layer == 8 || collision.gameObject.layer != 6) return;    //if the character has hit an obstacle before (if it's in layer 8) or the object that's hit is not in the obstacle layer let the collision happen as usual
 
+        OutOfPlay();
+
         //make the character rebound from obstacles with custom forces
-                
+
         contactPoint = collision.GetContact(0).point;
 
         //calculate the character's velocity relative to the contact point on the obstacle
@@ -91,8 +93,6 @@ public class PlayerBehaviour : MonoBehaviour
 
         //additional velocity in y direction proportional to the rebound velocity for take off effect
         rigidbody.AddForce(takeOffCoefficient * rebound.magnitude * Vector3.up, ForceMode.VelocityChange);
-
-        OutOfPlay();
     }
     private void OnTriggerExit(Collider collider)
     {
@@ -116,6 +116,8 @@ public class PlayerBehaviour : MonoBehaviour
     }
     private void OutOfPlay()
     {
+        StopAllCoroutines();
+
         rigidbody.constraints = RigidbodyConstraints.None;
         animator.applyRootMotion = false;
 
