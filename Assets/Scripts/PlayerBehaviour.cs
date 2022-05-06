@@ -60,8 +60,6 @@ public class PlayerBehaviour : MonoBehaviour
         //move in x axis within the swerve limits and go forward at current pace
         rigidbody.MovePosition(new Vector3(Clamp(position.x + swerveInput * maxSwerveSpeed * Time.fixedDeltaTime, -SwerveLimit, SwerveLimit), position.y, position.z + pace * Time.fixedDeltaTime));
 
-        //Debug.Log("move vel: " + velocity);
-
         //calculate the angle between the motion direction and z axis
         deflection = Atan((swerveInput * maxSwerveSpeed + 0.01f) / (pace + 0.01f)) / PI * 180;
 
@@ -75,8 +73,7 @@ public class PlayerBehaviour : MonoBehaviour
         if (gameObject.layer == 8 || collision.gameObject.layer != 6) return;    //if the character has hit an obstacle before (if it's in layer 8) or the object that's hit is not in the obstacle layer let the collision happen as usual
 
         //make the character rebound from obstacles with custom forces
-
-        //velocity instead of contact point velocity because only rotation that the character has is due to the animation and negligible
+                
         contactPoint = collision.GetContact(0).point;
 
         //calculate the character's velocity relative to the contact point on the obstacle
@@ -110,8 +107,11 @@ public class PlayerBehaviour : MonoBehaviour
             //restore the swerve limit when back on the stationary platform
             SwerveLimit = swerveLimit;
         }
-        else if (collider.gameObject.layer == 7)
-            //ignore the swerve limit when the player leaves the stationary platform
+    }
+    private void OnTriggerEnter(Collider collider)
+    {
+        if (collider.gameObject.layer == 9)
+            //ignore the swerve limit when the player is on the rotating platform
             SwerveLimit = Infinity;
     }
     private void OutOfPlay()
@@ -146,11 +146,9 @@ public class PlayerBehaviour : MonoBehaviour
         animator.SetFloat(blend, 0);
         animator.applyRootMotion = true;
         
-
         //restore constraints
         rigidbody.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
         
-
         //enable controls
         PlayerInput.FingerDown += StartMoving;
         PlayerInput.OnSwipe += Move;
@@ -159,7 +157,7 @@ public class PlayerBehaviour : MonoBehaviour
         //get the player on characters layer
         gameObject.layer = 3;
 
-        //restore teh swerve limit
+        //restore the swerve limit
         SwerveLimit = swerveLimit;
     }
 }
