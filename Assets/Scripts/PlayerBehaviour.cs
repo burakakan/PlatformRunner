@@ -36,7 +36,7 @@ public class PlayerBehaviour : MonoBehaviour
         StopAllCoroutines();
         StartCoroutine(Transition(-1 * deceleration));
     }
-    IEnumerator Transition(float acceleration)
+    private IEnumerator Transition(float acceleration)
     {
         //rigidbody.angularVelocity = Vector3.zero;
         for (; (acceleration < 0 && pace > 0) || (acceleration > 0 && pace < maxPace); pace += Time.deltaTime * acceleration)   //do the pace transition to maxPace when accelerating or to 0 when decelerating
@@ -52,7 +52,7 @@ public class PlayerBehaviour : MonoBehaviour
     }
     private Vector3 position, velocity;
     private float deflection;
-    void Move(float swerveInput)
+    private void Move(float swerveInput)
     {
         velocity = (rigidbody.position - position) / Time.fixedDeltaTime;
         position = rigidbody.position;
@@ -66,7 +66,7 @@ public class PlayerBehaviour : MonoBehaviour
         //gradually rotate the character towards the motion direction
         transform.eulerAngles += Sign((transform.eulerAngles.y + 360 - deflection) % 360 - 180) * rotationCorrectionRate * Time.fixedDeltaTime * Vector3.up;
     }
-
+    
     Vector3 contactPoint, relativeVelocity, rebound;
     private void OnCollisionEnter(Collision collision)
     {
@@ -123,14 +123,14 @@ public class PlayerBehaviour : MonoBehaviour
 
         //disable controls
         PlayerInput.FingerDown -= StartMoving;
-        PlayerInput.OnSwipe -= Move;
+        PlayerInput.Swerve -= Move;
         PlayerInput.FingerUp -= StopMoving;
 
         gameObject.layer = 8;   //move to the layer of collided characters
 
         StartCoroutine(RespawnCountdown());
     }
-    IEnumerator RespawnCountdown()
+    private IEnumerator RespawnCountdown()
     {
         yield return new WaitForSeconds(respawnWait);
         Spawn();
@@ -153,7 +153,7 @@ public class PlayerBehaviour : MonoBehaviour
         
         //enable controls
         PlayerInput.FingerDown += StartMoving;
-        PlayerInput.OnSwipe += Move;
+        PlayerInput.Swerve += Move;
         PlayerInput.FingerUp += StopMoving;
 
         //get the player on characters layer

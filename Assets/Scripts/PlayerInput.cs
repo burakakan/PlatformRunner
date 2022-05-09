@@ -11,7 +11,8 @@ public class PlayerInput : MonoBehaviour
     private float sensitivity = 1f/10f;
 
     public static event Action FingerDown = delegate { };
-    public static event Action<float> OnSwipe = delegate { };
+    public static event Action<float> Swerve = delegate { };
+    public static event Action<Vector2> SwerveFree = delegate { };
     public static event Action FingerUp = delegate { };
 
     private void Update()
@@ -24,7 +25,8 @@ public class PlayerInput : MonoBehaviour
             {
                 touchLastPosition = touch.position.x;
                 FingerDown();
-                OnSwipe(0);
+                Swerve(0);
+                SwerveFree(touch.position);
             }
 
             else if (touch.phase == TouchPhase.Ended)
@@ -32,8 +34,9 @@ public class PlayerInput : MonoBehaviour
 
             else
             {
-                OnSwipe(Mathf.Clamp((touch.position.x - touchLastPosition) * sensitivity, -1, 1));
+                Swerve(Mathf.Clamp((touch.position.x - touchLastPosition) * sensitivity, -1, 1));
                 touchLastPosition = touch.position.x;
+                SwerveFree(touch.position);
             }
         }
         else
@@ -42,7 +45,8 @@ public class PlayerInput : MonoBehaviour
             {
                 mouseLastPosition = Input.mousePosition.x;
                 FingerDown();
-                OnSwipe(0);
+                Swerve(0);
+                SwerveFree(Input.mousePosition);
             }
 
             else if (Input.GetMouseButtonUp(0))
@@ -50,8 +54,9 @@ public class PlayerInput : MonoBehaviour
 
             else if (Input.GetMouseButton(0))
             {
-                OnSwipe(Mathf.Clamp((Input.mousePosition.x - mouseLastPosition) * sensitivity, -1, 1));
+                Swerve(Mathf.Clamp((Input.mousePosition.x - mouseLastPosition) * sensitivity, -1, 1));
                 mouseLastPosition = Input.mousePosition.x;
+                SwerveFree(Input.mousePosition);
             }
         }
 
